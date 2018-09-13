@@ -1,0 +1,27 @@
+#!/usr/bin/lua
+
+local MODULE_NAME = "/usr/lib/libeToken.so"
+local module_in_args = false
+local cmd = ""
+
+for i, v in pairs(arg) do
+	if (v == "--module") then
+		module_in_args = true
+	end
+end
+
+if (module_in_args == false) then
+	table.insert(arg, "--module")
+	table.insert(arg, MODULE_NAME)
+end
+
+for i, v in pairs(arg) do
+	if (i > 0) then
+		cmd = cmd .. " " .. v
+	end
+end
+
+cmd = "pkcs11-tool" .. cmd
+
+print("Executing command: " .. cmd)
+os.execute(cmd)
