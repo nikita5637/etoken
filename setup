@@ -1,0 +1,117 @@
+#!/usr/bin/lua
+
+local DEBUG = false
+local LIBPATH = "/usr/lib/"
+local USER = os.getenv("USER")
+
+local LIBS = {
+	{ "libeToken.so.9.1.7", "libeToken.so" },
+	{ "libhal.so.1.0.0", "libhal.so.1" },
+--add below {libname, link} ...
+}
+
+local ELFS = {
+	{ "etoken", "/usr/bin/" }
+--add below {elf, path} ...
+}
+
+function Usage()
+	print("Usage:")
+	print(arg[0] .. " install")
+	print(arg[0] .. " uninstall")
+end
+
+function LogDebug(cmd)
+	if (DEBUG == true) then
+		print(cmd)
+	end
+end
+
+function  InstallLib(lib)
+	local cmd = ""
+
+	cmd = "cp " .. lib[1] .. " " .. LIBPATH
+	LogDebug(cmd)
+	io.write("   installing   " .. lib[1])
+	os.execute(cmd)
+	io.write("   [ok]\n")
+
+	cmd = "ln -s " .. LIBPATH .. lib[1] .. " " .. LIBPATH .. lib[2]
+	LogDebug(cmd)
+	io.write("   creating symlink   " .. LIBPATH .. lib[2])
+	os.execute(cmd)
+	io.write("   [ok]\n")
+	--#FIX return if error
+end
+
+function UninstallLib(lib)
+	local cmd = ""
+
+	cmd = "rm -f " .. LIBPATH .. lib[1] .. " " .. LIBPATH .. lib[2]
+	LogDebug(cmd)
+	io.write("   removing   " .. LIBPATH ..lib[1] .. " " .. LIBPATH .. lib[2])
+	os.execute(cmd)
+	io.write("   [ok]\n")
+	--#FIX return if error
+end
+
+function InstallElf(elf)
+	local cmd = ""
+
+	cmd = "cp " .. elf[1] .. " " .. elf[2]
+	LogDebug(cmd)
+	io.write("   installing   " .. elf[1])
+	os.execute(cmd)
+	io.write("   [ok]\n")
+	--#FIX return if error
+end
+
+function UninstallElf(elf)
+	local cmd = ""
+
+	cmd = "rm -f " .. elf[2] .. elf[1]
+	LogDebug(cmd)
+	io.write("   removing   " .. elf[2] .. elf[1])
+	os.execute(cmd)
+	io.write("   [ok]\n")
+	--#FIX return if error
+end
+
+function Install()
+	for _,lib in pairs(LIBS) do
+		InstallLib(lib)
+	end
+
+	for _,elf in pairs(ELFS) do
+		InstallElf(elf)
+	end
+end
+
+function Uninstall()
+	for _,lib in pairs(LIBS) do
+		UninstallLib(lib)
+	end
+
+	for _,elf in pairs(ELFS) do
+		UninstallElf(elf)
+	end
+end
+
+if (#arg ~= 1) then
+	Usage()
+	os.exit(1)
+end
+
+if (USER ~= "root") then
+		print("You must be root")
+		os.exit(1)
+end
+
+if (arg[1] == "install") then
+	Install()
+elseif (arg[1] == "uninstall") then
+	Uninstall()
+else
+	Usage()
+	os.exit(1)
+end
