@@ -1,18 +1,29 @@
 #!/usr/bin/lua
 
-local DEBUG = false
+local DEBUG = true
 local LIBPATH = "/usr/lib/"
 local USER = os.getenv("USER")
 
-local LIBS = {
-	{ "libeToken.so.9.1.7", "libeToken.so" },
-	{ "libhal.so.1.0.0", "libhal.so.1" },
---add below {libname, link} ...
+local DEBS = {
+	{ 001, "libssl1.1_1.1.0h-4_amd64.deb" },
+	{ 002, "libtinfo6_6.1+20180714-1_amd64.deb" },
+	{ 003, "libreadline7_7.0-5_amd64.deb" },
+	{ 004, "opensc-pkcs11_0.18.0-3_amd64.deb" },
+	{ 005, "opensc_0.18.0-3_amd64.deb" },
+	{ 006, "libpcsclite1_1.8.23-3_amd64.deb" },
+	{ 007, "libccid_1.4.29-2_amd64.deb" },
+	{ 008, "pcscd_1.8.23-3_amd64.deb" },
 }
 
 local ELFS = {
 	{ "etoken", "/usr/bin/" }
 --add below {elf, path} ...
+}
+
+local LIBS = {
+	{ "libeToken.so.9.1.7", "libeToken.so" },
+	--{ "libhal.so.1.0.0", "libhal.so.1" },
+--add below {libname, link} ...
 }
 
 function Usage()
@@ -77,7 +88,29 @@ function UninstallElf(elf)
 	--#FIX return if error
 end
 
+function InstallDeb(deb)
+	local cmd = ""
+
+	cmd = "dpkg -i " .. deb[2]
+	LogDebug(cmd)
+	os.execute(cmd)
+	--#FIX return if error
+end
+
+function UninstallDeb(deb)
+	local cmd = ""
+
+	cmd = "dpkg -r " .. deb[2]
+	LogDebug(cmd)
+	os.execute(cmd)
+	--#FIX return if error
+end
+
 function Install()
+	for _, deb in pairs(DEBS) do
+		InstallDeb(deb)
+	end
+
 	for _,lib in pairs(LIBS) do
 		InstallLib(lib)
 	end
@@ -88,6 +121,10 @@ function Install()
 end
 
 function Uninstall()
+	for _, deb in pairs(DEBS) do
+		UninstallDeb(deb)
+	end
+
 	for _,lib in pairs(LIBS) do
 		UninstallLib(lib)
 	end
