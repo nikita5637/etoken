@@ -1,6 +1,6 @@
 #!/usr/bin/lua
 
-local DEBUG = true
+local DEBUG = false
 local LIBPATH = "/usr/lib/"
 local USER = os.getenv("USER")
 
