@@ -12,8 +12,9 @@ For uninstall use
 ```
 
 ## Usage
+You can specify a custom module name, or use the default name(/usr/lib/libeToken.so)
 ```
-	etoken
+	etoken [--module %MODULE_NAME%]
 ```
 
 ## Utilities Used
